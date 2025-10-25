@@ -24,6 +24,7 @@
     {"$GMFolder":"","%Name":"Sounds","folderPath":"folders/Sounds.yy","name":"Sounds","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Sprites","folderPath":"folders/Sprites.yy","name":"Sprites","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Fish","folderPath":"folders/Sprites/Fish.yy","name":"Fish","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"Background","folderPath":"folders/Sprites/Background.yy","name":"Background","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Tile Sets","folderPath":"folders/Tile Sets.yy","name":"Tile Sets","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Timelines","folderPath":"folders/Timelines.yy","name":"Timelines","resourceType":"GMFolder","resourceVersion":"2.0",},
   ],
@@ -38,7 +39,10 @@
   "resources":[
     {"id":{"name":"obj_fish_controller","path":"objects/obj_fish_controller/obj_fish_controller.yy",},},
     {"id":{"name":"obj_shark_controller","path":"objects/obj_shark_controller/obj_shark_controller.yy",},},
-    {"id":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},
+    {"id":{"name":"rm_simulation","path":"rooms/rm_simulation/rm_simulation.yy",},},
+    {"id":{"name":"spr_background_light","path":"sprites/spr_background_light/spr_background_light.yy",},},
+    {"id":{"name":"spr_background_sand","path":"sprites/spr_background_sand/spr_background_sand.yy",},},
+    {"id":{"name":"spr_background","path":"sprites/spr_background/spr_background.yy",},},
     {"id":{"name":"spr_fish_a1","path":"sprites/spr_fish_a1/spr_fish_a1.yy",},},
     {"id":{"name":"spr_fish_a2","path":"sprites/spr_fish_a2/spr_fish_a2.yy",},},
     {"id":{"name":"spr_fish_a3","path":"sprites/spr_fish_a3/spr_fish_a3.yy",},},
@@ -62,7 +66,7 @@
   "resourceType":"GMProject",
   "resourceVersion":"2.0",
   "RoomOrderNodes":[
-    {"roomId":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},
+    {"roomId":{"name":"rm_simulation","path":"rooms/rm_simulation/rm_simulation.yy",},},
   ],
   "templateType":"game",
   "TextureGroups":[

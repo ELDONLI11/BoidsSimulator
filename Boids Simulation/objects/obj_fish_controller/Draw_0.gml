@@ -1,5 +1,8 @@
 /// Draw Event
 draw_clear(c_aqua);
+draw_sprite(spr_background_sand,0,0,0)
+draw_set_colour(c_black);
+draw_text(32, 32, "FPS = " + string(fps));
 
 for (var i = 0; i < boid_count; i++) {
     var b = boids[i];
