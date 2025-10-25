@@ -3,70 +3,116 @@ for (var i = 0; i < boid_count; i++) {
     var b = boids[i];
 
     // --- Rule 1: Fly toward center
-    var cx = 0;
-    var cy = 0;
-    var count = 0;
-    for (var j = 0; j < boid_count; j++) {
-        if (i == j) continue;
-        var o = boids[j];
-        var dx = b.bx - o.bx;
-        var dy = b.by - o.by;
-        var dist = sqrt(dx * dx + dy * dy);
-        if (dist < visual_range) {
-            cx += o.bx;
-            cy += o.by;
-            count++;
-        }
-    }
-    if (count > 0) {
-        cx /= count;
-        cy /= count;
-        b.vx += (cx - b.bx) * centering_factor;
-        b.vy += (cy - b.by) * centering_factor;
-    }
+    // --- Rule 1: Fly toward center (group by letter) ---
+	var cx = 0;
+	var cy = 0;
+	var count = 0;
+
+	// get this fish’s group letter
+	var my_sprite_name = sprite_get_name(b.sprite);
+	var my_group_letter = string_copy(my_sprite_name, 10, 1); // assuming spr_fish_a1 → 'a'
+
+	for (var j = 0; j < boid_count; j++) {
+	    if (i == j) continue;
+	    var o = boids[j];
+    
+	    var dx = b.bx - o.bx;
+	    var dy = b.by - o.by;
+	    var dist = sqrt(dx*dx + dy*dy);
+
+	    if (dist < visual_range) {
+	        // get other fish’s group letter
+	        var other_sprite_name = sprite_get_name(o.sprite);
+	        var other_group_letter = string_copy(other_sprite_name, 10, 1);
+
+	        // only flock with same group letter
+	        if (my_group_letter == other_group_letter) {
+	            cx += o.bx;
+	            cy += o.by;
+	            count++;
+	        }
+	    }
+	}
+
+	if (count > 0) {
+	    cx /= count;
+	    cy /= count;
+	    b.vx += (cx - b.bx) * centering_factor;
+	    b.vy += (cy - b.by) * centering_factor;
+	}
+
+
 
     // --- Rule 2: Avoid crowding
     var move_x = 0;
 	var move_y = 0;
+	var intergroup_x = 0;
+	var intergroup_y = 0;
+
 	for (var j = 0; j < boid_count; j++) {
 	    if (i == j) continue;
 	    var o = boids[j];
 	    var dx = b.bx - o.bx;
 	    var dy = b.by - o.by;
 	    var dist = sqrt(dx * dx + dy * dy);
-	    if (dist > 0 && dist < min_distance) {
-	        // Push harder when closer
+	    if (dist <= 0) continue;
+
+	    // get other fish’s group letter
+	    var other_sprite_name = sprite_get_name(o.sprite);
+	    var other_group_letter = string_copy(other_sprite_name, 10, 1);
+
+	    // --- Avoid same-group fish as before ---
+	    if (dist < min_distance && my_group_letter == other_group_letter) {
 	        var strength = (min_distance - dist) / min_distance;
 	        move_x += (dx / dist) * strength;
 	        move_y += (dy / dist) * strength;
 	    }
+
+	    // --- Mild avoidance for different-group fish ---
+	    if (dist < visual_range && my_group_letter != other_group_letter) {
+	        var strength = (visual_range - dist) / visual_range * 0.25; // tweak 0.25 for force
+	        intergroup_x += (dx / dist) * strength;
+	        intergroup_y += (dy / dist) * strength;
+	    }
 	}
-	// Apply stronger avoidance force
-	b.vx += move_x * avoid_factor * 1.5;
+
+	// Apply forces
+	b.vx += move_x * avoid_factor * 1.5;  // same-group
 	b.vy += move_y * avoid_factor * 1.5;
+	b.vx += intergroup_x;                 // different-group
+	b.vy += intergroup_y;
+
 
     // --- Rule 3: Match nearby velocity
-    var avg_vx = 0;
-    var avg_vy = 0;
-    count = 0;
-    for (var j = 0; j < boid_count; j++) {
-        if (i == j) continue;
-        var o = boids[j];
-        var dx = b.bx - o.bx;
-        var dy = b.by - o.by;
-        var dist = sqrt(dx * dx + dy * dy);
-        if (dist < visual_range) {
-            avg_vx += o.vx;
-            avg_vy += o.vy;
-            count++;
-        }
-    }
-    if (count > 0) {
-        avg_vx /= count;
-        avg_vy /= count;
-        b.vx += (avg_vx - b.vx) * matching_factor;
-        b.vy += (avg_vy - b.vy) * matching_factor;
-    } 
+    // --- Rule 3: Match nearby velocity (group only)
+	var avg_vx = 0;
+	var avg_vy = 0;
+	count = 0;
+	for (var j = 0; j < boid_count; j++) {
+	    if (i == j) continue;
+	    var o = boids[j];
+
+	    var dx = b.bx - o.bx;
+	    var dy = b.by - o.by;
+	    var dist = sqrt(dx*dx + dy*dy);
+
+	    // only consider fish within visual range AND same group
+	    var other_sprite_name = sprite_get_name(o.sprite);
+	    var other_group_letter = string_copy(other_sprite_name, 10, 1);
+
+	    if (dist < visual_range && my_group_letter == other_group_letter) {
+	        avg_vx += o.vx;
+	        avg_vy += o.vy;
+	        count++;
+	    }
+	}
+	if (count > 0) {
+	    avg_vx /= count;
+	    avg_vy /= count;
+	    b.vx += (avg_vx - b.vx) * matching_factor;
+	    b.vy += (avg_vy - b.vy) * matching_factor;
+	}
+
 
     // --- Rule 4: Smooth border steering
     var steer_x = 0;
