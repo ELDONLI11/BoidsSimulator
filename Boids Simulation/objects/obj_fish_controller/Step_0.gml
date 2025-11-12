@@ -1,5 +1,59 @@
 /// Step Event
 
+// Make sure we have sharks
+if (instance_exists(obj_shark_controller)) {
+    var shark_ctrl = instance_find(obj_shark_controller, 0);
+    var shark_count = array_length(shark_ctrl.sharks);
+
+    // Loop backward through boids to safely remove any fish
+    for (var i = array_length(boids) - 1; i >= 0; i--) {
+        var b = boids[i];
+
+        // Initialize variables if missing
+        if (!variable_struct_exists(b, "is_dying")) b.is_dying = false;
+        if (!variable_struct_exists(b, "fade_speed")) b.fade_speed = 0.05;
+        if (!variable_struct_exists(b, "alpha")) b.alpha = 1.0;
+
+        // Check shark collision if not dying
+        if (!b.is_dying) {
+            for (var s = 0; s < shark_count; s++) {
+                var sh = shark_ctrl.sharks[s];
+                var avoid_radius = 30
+                var dx = b.bx - sh.x;
+                var dy = b.by - sh.y;
+                var dist = sqrt(dx*dx + dy*dy);
+
+                if (dist < avoid_radius) {
+                    b.is_dying = true;
+                    b.fade_speed = 0.05 + random_range(0, 0.03); // random fade speed
+                    break;
+                }
+            }
+        } else {
+            // Fade out
+            b.alpha -= b.fade_speed;
+            if (b.alpha <= 0) {
+				boid_count--;
+                array_delete(boids, i, 1); // safe removal
+                continue;
+            }
+        }
+
+        // Save changes back to the array
+		
+        boids[i] = b;
+    }
+}
+
+
+
+
+
+
+
+
+
+
 // --- Clear spatial grid ---
 for (var c = 0; c < grid_cols; c++) {
     for (var r = 0; r < grid_rows; r++) {
@@ -156,3 +210,5 @@ for (var i = 0; i < boid_count; i++) {
 
     boids[i] = b;
 }
+
+

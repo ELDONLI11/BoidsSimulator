@@ -6,6 +6,10 @@ if (fish_ctrl != noone && variable_instance_exists(fish_ctrl, "boids")) {
     boid_count = array_length(boids);
 }
 
+
+
+
+
 for (var i = 0; i < array_length(sharks); i++) {
     var s = sharks[i];
 
